@@ -1,0 +1,157 @@
+import numpy as np
+
+# Fungsi untuk eliminasi Gauss
+def gauss_elimination(A, B):
+    n = len(B)
+    for i in range(n):
+        # Pivoting
+        max_row = i + np.argmax(np.abs(A[i:, i]))
+        A[[i, max_row]] = A[[max_row, i]]
+        B[[i, max_row]] = B[[max_row, i]]
+
+        # Eliminasi
+        for j in range(i + 1, n):
+            factor = A[j][i] / A[i][i]
+            A[j] = A[j] - factor * A[i]
+            B[j] = B[j] - factor * B[i]
+
+    # Substitusi balik
+    x = np.zeros(n)
+    for i in range(n - 1, -1, -1):
+        x[i] = (B[i] - np.dot(A[i, i + 1:], x[i + 1:])) / A[i][i]
+    return x
+
+# Fungsi untuk menghitung determinan menggunakan ekspansi kofaktor
+def determinant(matrix):
+    if len(matrix) == 1:
+        return matrix[0][0]
+    if len(matrix) == 2:
+        return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
+
+    det = 0
+    for c in range(len(matrix)):
+        sub_matrix = np.delete(np.delete(matrix, 0, axis=0), c, axis=1)
+        det += ((-1) ** c) * matrix[0][c] * determinant(sub_matrix)
+    return det
+
+# Fungsi untuk metode Gauss-Jordan
+def gauss_jordan(A, B):
+    n = len(B)
+    A = np.hstack((A, B.reshape(-1, 1)))  # Matriks augmented
+    for i in range(n):
+        A[i] = A[i] / A[i][i]
+        for j in range(n):
+            if i != j:
+                A[j] = A[j] - A[i] * A[j][i]
+    return A[:, -1]
+
+# Fungsi untuk menghitung adjoint
+def adjoint(matrix):
+    adj = np.zeros(matrix.shape)
+    for i in range(matrix.shape[0]):
+        for j in range(matrix.shape[1]):
+            minor = np.delete(np.delete(matrix, i, axis=0), j, axis=1)
+            adj[j][i] = ((-1) ** (i + j)) * determinant(minor)
+    return adj
+
+# Fungsi untuk menghitung invers menggunakan adjoint
+def inverse(matrix):
+    det = determinant(matrix)
+    if det == 0:
+        raise ValueError("Matriks singular dan tidak dapat di-invers.")
+    adj = adjoint(matrix)
+    return adj / det
+
+# Data awal
+A = np.array([[4, -1, -1], [-1, 3, -1], [-1, -1, 5]], dtype=float)
+B = np.array([5, 3, 4], dtype=float)
+
+# Penyelesaian menggunakan eliminasi Gauss
+solution_gauss = gauss_elimination(A.copy(), B.copy())
+print("Solusi menggunakan Eliminasi Gauss:", solution_gauss)
+
+# Menghitung determinan dengan ekspansi kofaktor
+det = determinant(A)
+print("Determinant menggunakan ekspansi kofaktor:", det)
+
+# Penyelesaian menggunakan Gauss-Jordan
+solution_gauss_jordan = gauss_jordan(A.copy(), B.copy())
+print("Solusi menggunakan Gauss-Jordan:", solution_gauss_jordan)
+
+# Menghitung invers menggunakan metode adjoin
+inverse_matrix = inverse(A)
+print("Matriks invers menggunakan metode adjoin:", inverse_matrix)
+import numpy as np
+
+def gauss_elimination(A, B):
+    n = len(B)
+    for i in range(n):
+        # Pivoting
+        max_row = i + np.argmax(np.abs(A[i:, i]))
+        A[[i, max_row]] = A[[max_row, i]]
+        B[[i, max_row]] = B[[max_row, i]]
+
+        # Elimination
+        for j in range(i + 1, n):
+            factor = A[j][i] / A[i][i]
+            A[j] = A[j] - factor * A[i]
+            B[j] = B[j] - factor * B[i]
+
+    # Back substitution
+    x = np.zeros(n)
+    for i in range(n - 1, -1, -1):
+        x[i] = (B[i] - np.dot(A[i, i + 1:], x[i + 1:])) / A[i][i]
+    return x
+
+A = np.array([[4, -1, -1], [-1, 3, -1], [-1, -1, 5]], dtype=float)
+B = np.array([5, 3, 4], dtype=float)
+
+solution = gauss_elimination(A, B)
+print("Solution using Gaussian elimination:", solution)
+def determinant(matrix):
+    if len(matrix) == 1:
+        return matrix[0][0]
+    if len(matrix) == 2:
+        return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
+
+    det = 0
+    for c in range(len(matrix)):
+        sub_matrix = np.delete(np.delete(matrix, 0, axis=0), c, axis=1)
+        det += ((-1) ** c) * matrix[0][c] * determinant(sub_matrix)
+    return det
+
+matrix = np.array([[4, -1, -1], [-1, 3, -1], [-1, -1, 5]])
+det = determinant(matrix)
+print("Determinant using cofactor expansion:", det)
+ef gauss_jordan(A, B):
+    n = len(B)
+    A = np.hstack((A, B.reshape(-1, 1)))  # Augment A with B
+    for i in range(n):
+        A[i] = A[i] / A[i][i]
+        for j in range(n):
+            if i != j:
+                A[j] = A[j] - A[i] * A[j][i]
+    return A[:, -1]
+
+A = np.array([[4, -1, -1], [-1, 3, -1], [-1, -1, 5]], dtype=float)
+B = np.array([5, 3, 4], dtype=float)
+
+solution_gauss_jordan = gauss_jordan(A, B)
+print("Solution using Gauss-Jordan:", solution_gauss_jordan)
+def adjoint(matrix):
+    adj = np.zeros(matrix.shape)
+    for i in range(matrix.shape[0]):
+        for j in range(matrix.shape[1]):
+            minor = np.delete(np.delete(matrix, i, axis=0), j, axis=1)
+            adj[j][i] = ((-1) ** (i + j)) * determinant(minor)
+    return adj
+
+def inverse(matrix):
+    det = determinant(matrix)
+    if det == 0:
+        raise ValueError("Matrix is singular and cannot be inverted.")
+    adj = adjoint(matrix)
+    return adj / det
+
+inverse_matrix = inverse(matrix)
+print("Inverse matrix using adjoint method:", inverse_matrix)
