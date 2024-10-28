@@ -1,0 +1,61 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Parameter yang diberikan
+L = 0.5  # H
+C = 10e-6  # F
+f0 = 1000  # Hz
+
+# Fungsi untuk menghitung f(R) dan f'(R)
+def f(R):
+    return (1 / (2 * np.pi * np.sqrt(L * C))) * np.sqrt(1 - (R*2) / (4 * L*2))
+
+def df(R):
+    return (-R / (4 * np.pi * L * np.sqrt(L * C))) * (1 - (R*2) / (4 * L2))*(-0.5)
+
+# Metode Biseksi
+def bisection(a, b, tol):
+    while (b - a) / 2 > tol:
+        c = (a + b) / 2
+        if f(c) == f0:
+            return c
+        elif f(a) * f(c) < 0:
+            b = c
+        else:
+            a = c
+    return (a + b) / 2
+
+# Metode Newton-Raphson
+def newton_raphson(x0, tol):
+    x = x0
+    while abs(f(x) - f0) > tol:
+        x = x - f(x) / df(x)
+    return x
+
+# Interval awal untuk biseksi dan tebakan awal untuk Newton-Raphson
+a = 0
+b = 100
+x0 = 50
+
+# Toleransi error
+tol = 0.1
+
+# Panggil fungsi dan simpan hasil
+root_bisection = bisection(a, b, tol)
+root_newton = newton_raphson(x0, tol)
+
+# Visualisasi
+R_values = np.linspace(0, 100, 1000)
+f_values = f(R_values)
+plt.plot(R_values, f_values, label='f(R)')
+plt.axhline(y=f0, color='r', linestyle='--', label='f0')
+plt.xlabel("R")
+plt.ylabel("f(R)")
+plt.title("Perbandingan Metode Biseksi dan Newton-Raphson")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Cetak hasil
+print("Akar menggunakan metode biseksi:", root_bisection)
+print("Akar menggunakan metode Newton-Raphson:", root_newton)
