@@ -1,0 +1,123 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Fungsi untuk menghitung R(T)
+def resistance(T):
+    """
+    Menghitung resistansi termistor pada temperatur T.
+    
+    Parameters:
+    T (float): Temperatur dalam Kelvin.
+
+    Returns:
+    float: Nilai resistansi R pada temperatur T.
+    """
+    return 5000 * np.exp(3500 * (1 / T - 1 / 298))
+# Metode selisih maju
+def forward_difference(T, h):
+    """
+    Menghitung turunan menggunakan metode selisih maju.
+    
+    Parameters:
+    T (float): Temperatur dalam Kelvin.
+    h (float): Langkah perubahan kecil dalam T.
+
+    Returns:
+    float: Nilai turunan dR/dT menggunakan selisih maju.
+    """
+    return (resistance(T + h) - resistance(T)) / h
+
+# Metode selisih mundur
+def backward_difference(T, h):
+    """
+    Menghitung turunan menggunakan metode selisih mundur.
+    
+    Parameters:
+    T (float): Temperatur dalam Kelvin.
+    h (float): Langkah perubahan kecil dalam T.
+
+    Returns:
+    float: Nilai turunan dR/dT menggunakan selisih mundur.
+    """
+    return (resistance(T) - resistance(T - h)) / h
+
+# Metode selisih tengah
+def central_difference(T, h):
+    """
+    Menghitung turunan menggunakan metode selisih tengah.
+    
+    Parameters:
+    T (float): Temperatur dalam Kelvin.
+    h (float): Langkah perubahan kecil dalam T.
+
+    Returns:
+    float: Nilai turunan dR/dT menggunakan selisih tengah.
+    """
+    return (resistance(T + h) - resistance(T - h)) / (2 * h)
+# Turunan eksak dR/dT
+def exact_derivative(T):
+    """
+    Menghitung turunan eksak dari R(T).
+    
+    Parameters:
+    T (float): Temperatur dalam Kelvin.
+
+    Returns:
+    float: Nilai turunan eksak dR/dT pada temperatur T.
+    """
+    return resistance(T) * (-3500 / T**2)
+# Parameter
+T_range = np.arange(250, 351, 10)
+h = 1e-3  # Langkah kecil
+
+# Menyimpan hasil turunan
+forward_results = []
+backward_results = []
+central_results = []
+exact_results = []
+
+for T in T_range:
+    forward_results.append(forward_difference(T, h))
+    backward_results.append(backward_difference(T, h))
+    central_results.append(central_difference(T, h))
+    exact_results.append(exact_derivative(T))
+
+# Konversi hasil menjadi array numpy
+forward_results = np.array(forward_results)
+backward_results = np.array(backward_results)
+central_results = np.array(central_results)
+exact_results = np.array(exact_results)
+# Metode extrapolasi Richardson
+def richardson_extrapolation(T, h):
+    """
+    Menghitung turunan dengan metode extrapolasi Richardson.
+    
+    Parameters:
+    T (float): Temperatur dalam Kelvin.
+    h (float): Langkah perubahan kecil dalam T.
+
+    Returns:
+    float: Nilai turunan dR/dT menggunakan extrapolasi Richardson.
+    """
+    D1 = central_difference(T, h)
+    D2 = central_difference(T, h / 2)
+    return (4 * D2 - D1) / 3
+
+# Hitung turunan menggunakan Richardson
+richardson_results = np.array([richardson_extrapolation(T, h) for T in T_range])
+
+# Hitung error relatif untuk Richardson
+richardson_error = np.abs((richardson_results - exact_results) / exact_results) * 100
+
+# Plot perbandingan error
+plt.figure(figsize=(10, 6))
+plt.plot(T_range, forward_error, label="Forward Difference Error", marker='o')
+plt.plot(T_range, backward_error, label="Backward Difference Error", marker='s')
+plt.plot(T_range, central_error, label="Central Difference Error", marker='^')
+plt.plot(T_range, richardson_error, label="Richardson Extrapolation Error", marker='x')
+plt.xlabel("Temperature (K)")
+plt.ylabel("Relative Error (%)")
+plt.title("Relative Error Comparison of Numerical Differentiation Methods")
+plt.legend()
+plt.grid()
+plt.show()
